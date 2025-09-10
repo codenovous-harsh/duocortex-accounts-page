@@ -9,10 +9,13 @@ const Layout = ({
   showBack = false,
   onBack,
   className = "",
+  showHeader = true,
 }) => {
   return (
     <div className="min-h-screen bg-white">
-      {/* <Header title={title} showBack={showBack} onBack={onBack} /> */}
+      {showHeader && (
+        <Header title={title} showBack={showBack} onBack={onBack} />
+      )}
 
       <main
         className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 ${className}`}

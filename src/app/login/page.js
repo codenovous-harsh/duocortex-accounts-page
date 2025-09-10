@@ -173,7 +173,20 @@ function LoginComponent() {
           <p className="text-xl text-gray-600">We&apos;re glad to see you</p>
         </div>
 
-        <Card className="p-6" padding="large">
+        <Card className="p-6 relative" padding="large">
+          {/** Simple logout button if user landed here authenticated */}
+          {status === "authenticated" && (
+            <button
+              onClick={() => {
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("userInfo");
+                window.location.href = "/login";
+              }}
+              className="absolute top-3 right-3 text-sm text-duo-primary hover:underline"
+            >
+              Logout
+            </button>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               type="email"

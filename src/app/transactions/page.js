@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Card from "@/components/ui/Card";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import api, { endpoints } from "@/lib/axios";
+import Layout from "@/components/layout/Layout";
 
 export default function Transactions() {
   const { user, authenticated, loading } = useAuth();
@@ -138,7 +139,7 @@ export default function Transactions() {
     switch (type) {
       case "recharge":
         return (
-          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+          <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-lg">
             <svg
               className="w-5 h-5 text-green-600"
               fill="none"
@@ -156,7 +157,7 @@ export default function Transactions() {
         );
       case "withdrawal":
         return (
-          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+          <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
             <svg
               className="w-5 h-5 text-blue-600"
               fill="none"
@@ -174,7 +175,7 @@ export default function Transactions() {
         );
       case "quiz_win":
         return (
-          <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+          <div className="flex items-center justify-center w-10 h-10 bg-yellow-100 rounded-lg">
             <svg
               className="w-5 h-5 text-yellow-600"
               fill="none"
@@ -192,7 +193,7 @@ export default function Transactions() {
         );
       case "quiz_loss":
         return (
-          <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+          <div className="flex items-center justify-center w-10 h-10 bg-red-100 rounded-lg">
             <svg
               className="w-5 h-5 text-red-600"
               fill="none"
@@ -210,7 +211,7 @@ export default function Transactions() {
         );
       default:
         return (
-          <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+          <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg">
             <svg
               className="w-5 h-5 text-gray-600"
               fill="none"
@@ -274,160 +275,162 @@ export default function Transactions() {
   }
 
   return (
-    <div className="space-y-6 px-2 sm:px-0">
-      {/* Duo Balance - matching brand language */}
-      <Card>
-        <Card.Content>
-          <div className="border-b border-gray-200 pb-4 mb-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-medium text-duo-text-primary">
-                Duo Balance
+    <Layout title="Quiz History">
+      <div className="max-w-3xl px-2 mx-auto space-y-6 sm:px-0">
+        {/* Duo Balance - matching brand language */}
+        <Card>
+          <Card.Content>
+            <div className="pb-4 mb-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-medium text-duo-text-primary">
+                  Duo Balance
+                </h2>
+                <div className="flex items-center space-x-1">
+                  <span className="text-2xl font-semibold">₹</span>
+                  <span className="text-2xl font-light text-black">
+                    {user.coins || "0"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Total Wins and Losses */}
+            <div className="flex gap-6">
+              <div>
+                <h3 className="mb-1 text-base font-medium text-duo-text-primary">
+                  Total wins
+                </h3>
+                <div className="flex items-center">
+                  <span className="text-xl">₹</span>
+                  <span className="ml-1 text-xl">{winAmount || "0"}</span>
+                </div>
+              </div>
+              <div>
+                <h3 className="mb-1 text-base font-medium text-duo-text-primary">
+                  Total losses
+                </h3>
+                <div className="flex items-center">
+                  <span className="text-xl">₹</span>
+                  <span className="ml-1 text-xl">{lossAmount || "0"}</span>
+                </div>
+              </div>
+            </div>
+          </Card.Content>
+        </Card>
+
+        {/* Transactions Section */}
+        <Card>
+          <Card.Content>
+            <div className="pb-3 mb-6 border-b border-gray-200">
+              <h2 className="text-base font-normal text-duo-text-primary">
+                Transactions
               </h2>
-              <div className="flex items-center space-x-1">
-                <span className="text-2xl font-semibold">₹</span>
-                <span className="text-2xl font-light text-black">
-                  {user.coins || "0"}
-                </span>
-              </div>
             </div>
-          </div>
 
-          {/* Total Wins and Losses */}
-          <div className="flex gap-6">
-            <div>
-              <h3 className="text-base font-medium text-duo-text-primary mb-1">
-                Total wins
-              </h3>
-              <div className="flex items-center">
-                <span className="text-xl">₹</span>
-                <span className="text-xl ml-1">{winAmount || "0"}</span>
-              </div>
-            </div>
-            <div>
-              <h3 className="text-base font-medium text-duo-text-primary mb-1">
-                Total losses
-              </h3>
-              <div className="flex items-center">
-                <span className="text-xl">₹</span>
-                <span className="text-xl ml-1">{lossAmount || "0"}</span>
-              </div>
-            </div>
-          </div>
-        </Card.Content>
-      </Card>
-
-      {/* Transactions Section */}
-      <Card>
-        <Card.Content>
-          <div className="border-b border-gray-200 pb-3 mb-6">
-            <h2 className="text-base font-normal text-duo-text-primary">
-              Transactions
-            </h2>
-          </div>
-
-          <div className="flex flex-wrap gap-4 mb-6">
-            {/* Filter by Result */}
-            <div>
-              <label className="block text-sm font-medium text-duo-text-primary mb-2">
-                Filter by Result
-              </label>
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="px-3 py-2 border border-duo-border rounded-lg focus:outline-none focus:ring-2 focus:ring-duo-primary/20"
-              >
-                <option value="all">All Quizzes</option>
-                <option value="quiz_win">Wins Only</option>
-                <option value="quiz_loss">Losses Only</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Transactions List */}
-          {transactionsLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <LoadingSpinner size="medium" />
-            </div>
-          ) : filteredTransactions.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-duo-bg-purple rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-duo-primary"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            <div className="flex flex-wrap gap-4 mb-6">
+              {/* Filter by Result */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-duo-text-primary">
+                  Filter by Result
+                </label>
+                <select
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  className="px-3 py-2 border rounded-lg border-duo-border focus:outline-none focus:ring-2 focus:ring-duo-primary/20"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
+                  <option value="all">All Quizzes</option>
+                  <option value="quiz_win">Wins Only</option>
+                  <option value="quiz_loss">Losses Only</option>
+                </select>
               </div>
-              <h3 className="text-lg font-medium text-duo-text-primary mb-2">
-                No quizzes found
-              </h3>
-              <p className="text-duo-text-secondary">
-                {filter === "all"
-                  ? "You haven't attempted any quizzes yet."
-                  : filter === "quiz_win"
-                  ? "No winning quizzes found."
-                  : "No losing quizzes found."}
-              </p>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredTransactions
-                .map((transaction, index) => {
-                  // Safety check for transaction data
-                  if (!transaction || !transaction.id) {
-                    return null;
-                  }
 
-                  return (
-                    <div
-                      key={transaction.id || index}
-                      className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0"
-                    >
-                      {/* Left: Quiz Name and Date */}
-                      <div className="flex-1 max-w-[40%]">
-                        <h4 className="font-medium text-duo-text-primary text-sm">
-                          {transaction.metadata?.quiz_name || "Quiz"}
-                        </h4>
-                        <p className="text-xs text-duo-text-secondary font-light">
-                          {(() => {
-                            try {
-                              return transaction.created_at.slice(0, 10);
-                            } catch (dateError) {
-                              return "Date unavailable";
-                            }
-                          })()}
-                        </p>
-                      </div>
+            {/* Transactions List */}
+            {transactionsLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <LoadingSpinner size="medium" />
+              </div>
+            ) : filteredTransactions.length === 0 ? (
+              <div className="py-12 text-center">
+                <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-duo-bg-purple">
+                  <svg
+                    className="w-8 h-8 text-duo-primary"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
+                  </svg>
+                </div>
+                <h3 className="mb-2 text-lg font-medium text-duo-text-primary">
+                  No quizzes found
+                </h3>
+                <p className="text-duo-text-secondary">
+                  {filter === "all"
+                    ? "You haven't attempted any quizzes yet."
+                    : filter === "quiz_win"
+                    ? "No winning quizzes found."
+                    : "No losing quizzes found."}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredTransactions
+                  .map((transaction, index) => {
+                    // Safety check for transaction data
+                    if (!transaction || !transaction.id) {
+                      return null;
+                    }
 
-                      {/* Center: Result */}
-                      <div className="flex-1 text-center">
-                        <span className="text-duo-text-secondary font-light">
-                          {transaction.metadata?.won ? "Winning" : "Lost"}
-                        </span>
-                      </div>
+                    return (
+                      <div
+                        key={transaction.id || index}
+                        className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0"
+                      >
+                        {/* Left: Quiz Name and Date */}
+                        <div className="flex-1 max-w-[40%]">
+                          <h4 className="text-sm font-medium text-duo-text-primary">
+                            {transaction.metadata?.quiz_name || "Quiz"}
+                          </h4>
+                          <p className="text-xs font-light text-duo-text-secondary">
+                            {(() => {
+                              try {
+                                return transaction.created_at.slice(0, 10);
+                              } catch (dateError) {
+                                return "Date unavailable";
+                              }
+                            })()}
+                          </p>
+                        </div>
 
-                      {/* Right: Amount with Rupee Symbol */}
-                      <div className="flex items-center gap-1">
-                        <span className="text-lg">₹</span>
-                        <span className="text-sm text-duo-text-primary font-light">
-                          {transaction.amount || "0"}
-                        </span>
+                        {/* Center: Result */}
+                        <div className="flex-1 text-center">
+                          <span className="font-light text-duo-text-secondary">
+                            {transaction.metadata?.won ? "Winning" : "Lost"}
+                          </span>
+                        </div>
+
+                        {/* Right: Amount with Rupee Symbol */}
+                        <div className="flex items-center gap-1">
+                          <span className="text-lg">₹</span>
+                          <span className="text-sm font-light text-duo-text-primary">
+                            {transaction.amount || "0"}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })
-                .filter(Boolean)}
-            </div>
-          )}
-        </Card.Content>
-      </Card>
-    </div>
+                    );
+                  })
+                  .filter(Boolean)}
+              </div>
+            )}
+          </Card.Content>
+        </Card>
+      </div>
+    </Layout>
   );
 }

@@ -94,13 +94,8 @@ export default function Wallet() {
       // Note: After successful payment, user will be redirected to /payment-status page
     } catch (err) {
       console.error("Payment error:", err);
-      const raw = err?.message || "";
-      // Detect Cashfree phone invalid error and show guidance modal
-      if (
-        raw.includes("customer_phone") ||
-        raw.includes("phone") ||
-        raw.includes("customer_details.customer_phone_invalid")
-      ) {
+      // Show modal ONLY for Cashfree phone invalid error
+      if (err?.code === "customer_details.customer_phone_invalid") {
         setShowProfileModal(true);
         setError("");
       } else {
