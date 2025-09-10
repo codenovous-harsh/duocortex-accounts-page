@@ -7,7 +7,7 @@ import Button from "@/components/ui/Button";
 
 export default function Signup() {
   return (
-    <Layout title="Create Account">
+    <Layout title="Create Account" showHeader={false}>
       <div className="flex items-center justify-center min-h-[70vh] px-2 sm:px-0">
         <Card className="w-full max-w-md p-6" padding="large">
           <div className="text-center">

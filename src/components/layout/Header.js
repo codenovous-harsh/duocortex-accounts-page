@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import CoinIcon from "@/components/ui/CoinIcon";
 
 const Header = ({ title, showBack = false, onBack }) => {
   const { user, logout } = useAuth();
@@ -52,11 +53,12 @@ const Header = ({ title, showBack = false, onBack }) => {
                     Duo Balance
                   </p>
                   <div className="flex items-center space-x-1">
+                    <CoinIcon size={18} className="mr-1" />
                     <span className="text-lg font-semibold text-duo-primary">
-                      ₹{user.coins || 0}
+                      {user.coins || 0}
                     </span>
                     <span className="text-sm text-duo-text-secondary">
-                      coins
+                      duo balance
                     </span>
                   </div>
                 </div>

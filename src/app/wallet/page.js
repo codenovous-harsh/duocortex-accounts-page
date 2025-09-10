@@ -8,6 +8,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import CoinIcon from "@/components/ui/CoinIcon";
 import {
   createPaymentSession,
   initiatePayment,
@@ -108,7 +109,7 @@ export default function Wallet() {
 
   if (loading) {
     return (
-      <Layout title="Add Coins">
+      <Layout title="Add Duo Balance">
         <div className="flex items-center justify-center min-h-[60vh]">
           <LoadingSpinner size="large" />
         </div>
@@ -123,7 +124,7 @@ export default function Wallet() {
   return (
     <Suspense>
       <Layout
-        title="Add Coins"
+        title="Add Duo Balance"
         showBack={true}
         onBack={() => router.push("/dashboard")}
       >
@@ -135,21 +136,21 @@ export default function Wallet() {
                 Duo Balance
               </h2>
               <div className="flex items-center justify-center space-x-2">
-                <span className="text-3xl">₹</span>
+                <CoinIcon size={40} className="" />
                 <span className="text-4xl font-bold text-duo-text-primary">
                   {user.coins || "0"}
                 </span>
               </div>
               <p className="text-sm text-duo-text-secondary mt-2">
-                1 coin = ₹1 | Coins are equivalent to real cash
+                1 duo balance = ₹1 | Duo balance is equivalent to real cash
               </p>
             </div>
           </Card>
 
-          {/* Add Coins Form */}
+          {/* Add Duo Balance Form */}
           <Card>
             <Card.Header>
-              <Card.Title>Add Coins to Duo Balance</Card.Title>
+              <Card.Title>Add Duo Balance</Card.Title>
             </Card.Header>
             <Card.Content>
               <div className="space-y-6">
@@ -302,7 +303,7 @@ export default function Wallet() {
                   </div>
                 )}
 
-                {/* Add Coins Button */}
+                {/* Add Duo Balance Button */}
                 <Button
                   onClick={handlePayment}
                   disabled={!amount || !!error || paymentLoading}
@@ -378,7 +379,7 @@ export default function Wallet() {
                 <p className="text-sm text-gray-600">
                   Please login on the DuoCortex mobile app and complete your
                   profile (add a valid phone number). Then come back to add
-                  coins.
+                  duo balance.
                 </p>
               </div>
               <div className="mt-4 grid sm:grid-cols-2 gap-3">

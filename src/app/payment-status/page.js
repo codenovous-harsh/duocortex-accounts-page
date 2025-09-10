@@ -1,5 +1,6 @@
 "use client";
 import { Suspense } from "react";
+import CoinIcon from "@/components/ui/CoinIcon";
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -194,9 +195,12 @@ function PaymentStatusContent() {
                   {user && (
                     <div className="flex justify-between">
                       <span className="text-green-700">New Balance:</span>
-                      <span className="font-semibold text-green-800">
-                        ₹{user.coins || 0}
-                      </span>
+                      <div className="flex items-center space-x-1">
+                        <CoinIcon size={18} className="" />
+                        <span className="font-semibold text-green-800">
+                          {user.coins || 0}
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -241,7 +245,7 @@ function PaymentStatusContent() {
                   What&apos;s Next?
                 </h4>
                 <ul className="text-sm text-green-700 mt-1 space-y-1">
-                  <li>• Your coins have been added to your wallet</li>
+                  <li>• Your <CoinIcon size={14} className="inline mx-1" />duo balance has been added to your wallet</li>
                   <li>• You can now participate in quizzes</li>
                   <li>• Track your transactions in the history section</li>
                 </ul>

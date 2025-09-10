@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "DuoCortex Accounts - Coin Management Portal",
-  description: "Secure coin management portal for DuoCortex users",
+  title: "DuoCortex Accounts - Duo Balance Management Portal",
+  description: "Secure duo balance management portal for DuoCortex users",
   icons: {
     icon: "/favicon.ico",
   },

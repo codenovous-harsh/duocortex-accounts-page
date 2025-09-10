@@ -7,6 +7,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import CoinIcon from "@/components/ui/CoinIcon";
 import api, { endpoints } from "@/lib/axios";
 import Layout from "@/components/layout/Layout";
 
@@ -46,7 +47,7 @@ export default function Withdraw() {
     } else if (amount < 100) {
       newErrors.amount = "Minimum withdrawal amount is ₹100";
     } else if (amount > availableCoins) {
-      newErrors.amount = "Amount exceeds available coins";
+      newErrors.amount = "Amount exceeds available duo balance";
     }
 
     // Account holder name
@@ -175,7 +176,7 @@ export default function Withdraw() {
                   Duo Balance
                 </h2>
                 <div className="flex items-center space-x-1">
-                  <span className="text-2xl font-semibold">₹</span>
+                  <CoinIcon size={24} className="mr-1" />
                   <span className="text-2xl font-light text-black">
                     {totalCoins}
                   </span>
@@ -189,7 +190,7 @@ export default function Withdraw() {
                 Available for Withdrawal
               </h3>
               <div className="flex items-center space-x-1">
-                <span className="text-3xl">₹</span>
+                <CoinIcon size={32} className="mr-1" />
                 <span className="text-4xl font-bold text-duo-text-primary">
                   {availableCoins}
                 </span>

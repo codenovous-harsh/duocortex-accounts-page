@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Card from "@/components/ui/Card";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import Layout from "@/components/layout/Layout";
+import CoinIcon from "@/components/ui/CoinIcon";
 
 export default function Dashboard() {
   const { user, authenticated, loading, refreshUser } = useAuth();
@@ -50,7 +51,7 @@ export default function Dashboard() {
 
   const quickActions = [
     {
-      title: "Add Coins",
+      title: "Add Duo Balance",
       description: "Recharge your DuoCortex wallet",
       icon: (
         <svg
@@ -72,7 +73,7 @@ export default function Dashboard() {
     },
     {
       title: "Withdraw Earnings",
-      description: "Cash out your available coins",
+      description: "Cash out your available duo balance",
       icon: (
         <svg
           className="w-8 h-8"
@@ -126,15 +127,18 @@ export default function Dashboard() {
                   Welcome back, {user.name}!
                 </h2>
                 <p className="text-white/90">
-                  Manage your DuoCortex coins and transactions
+                  Manage your DuoCortex duo balance and transactions
                 </p>
               </div>
               <div className="text-right">
                 <p className="text-sm text-white/80">Duo Balance</p>
-                <p className="text-3xl font-extrabold sm:text-4xl">
-                  ₹{user.coins || 0}
-                </p>
-                <p className="text-sm text-white/80">coins</p>
+                <div className="flex items-center justify-end space-x-2">
+                  <CoinIcon size={32} className="" />
+                  <p className="text-3xl font-extrabold sm:text-4xl">
+                    {user.coins || 0}
+                  </p>
+                </div>
+                <p className="text-sm text-white/80">duo balance</p>
               </div>
             </div>
           </div>
@@ -144,29 +148,19 @@ export default function Dashboard() {
         <div className="grid gap-4 md:grid-cols-2 sm:gap-6">
           <Card>
             <Card.Header>
-              <Card.Title>Total Coins</Card.Title>
+              <Card.Title>Total Duo Balance</Card.Title>
             </Card.Header>
             <Card.Content>
               <div className="flex items-center space-x-4">
                 <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-duo-bg-purple">
-                  <svg
-                    className="w-6 h-6 text-duo-primary"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                    />
-                  </svg>
+                  <span className="text-2xl font-bold text-duo-primary">₹</span>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-duo-text-primary">
-                    ₹{user.coins || 0}
-                  </p>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-2xl font-bold text-duo-text-primary">
+                      {user.coins || 0}
+                    </p>
+                  </div>
                   <p className="text-sm text-duo-text-secondary">
                     Available Duo Balance
                   </p>
@@ -197,9 +191,11 @@ export default function Dashboard() {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-duo-text-primary">
-                    ₹{user.availableCoins || 0}
-                  </p>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-2xl font-bold text-duo-text-primary">
+                      {user.availableCoins || 0}
+                    </p>
+                  </div>
                   <p className="text-sm text-duo-text-secondary">
                     Ready to withdraw (Min: ₹100)
                   </p>

@@ -7,6 +7,7 @@ import Card from "@/components/ui/Card";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import api, { endpoints } from "@/lib/axios";
 import Layout from "@/components/layout/Layout";
+import CoinIcon from "@/components/ui/CoinIcon";
 
 export default function Transactions() {
   const { user, authenticated, loading } = useAuth();
@@ -233,7 +234,12 @@ export default function Transactions() {
   const getTransactionTitle = (transaction) => {
     switch (transaction.type) {
       case "recharge":
-        return "Coin Recharge";
+        return (
+          <span className="flex items-center">
+            <CoinIcon size={14} className="inline mr-1" />
+            Duo Balance Recharge
+          </span>
+        );
       case "withdrawal":
         return "Withdrawal Request";
       case "quiz_win":
@@ -286,7 +292,7 @@ export default function Transactions() {
                   Duo Balance
                 </h2>
                 <div className="flex items-center space-x-1">
-                  <span className="text-2xl font-semibold">₹</span>
+                  <CoinIcon size={24} className="mr-1" />
                   <span className="text-2xl font-light text-black">
                     {user.coins || "0"}
                   </span>
