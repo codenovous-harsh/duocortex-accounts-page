@@ -274,14 +274,14 @@ export default function Transactions() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Balance Available - matching mobile app */}
+    <div className="space-y-6 px-2 sm:px-0">
+      {/* Duo Balance - matching brand language */}
       <Card>
         <Card.Content>
           <div className="border-b border-gray-200 pb-4 mb-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-medium text-duo-text-primary">
-                Balance Available
+                Duo Balance
               </h2>
               <div className="flex items-center space-x-1">
                 <span className="text-2xl font-semibold">₹</span>

@@ -1,24 +1,27 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
-const Card = ({ 
-  children, 
-  className = '', 
-  padding = 'large',
+const Card = ({
+  children,
+  className = "",
+  padding = "large",
   shadow = true,
-  ...props 
+  ...props
 }) => {
-  const baseClasses = 'bg-white rounded-lg border border-duo-border';
-  
+  const baseClasses = "bg-white rounded-lg border border-duo-border";
+
+  // Responsive padding that feels right on mobile and scales up
   const paddingClasses = {
-    none: '',
-    small: 'p-4',
-    medium: 'p-6',
-    large: 'p-8',
+    none: "",
+    small: "p-3 sm:p-4",
+    medium: "p-4 sm:p-5 md:p-6",
+    large: "p-4 sm:p-6 md:p-8",
   };
 
-  const shadowClass = shadow ? 'shadow-lg hover:shadow-xl transition-shadow duration-200' : '';
+  const shadowClass = shadow
+    ? "shadow-lg hover:shadow-xl transition-shadow duration-200"
+    : "";
 
   const classes = `
     ${baseClasses}
@@ -34,25 +37,28 @@ const Card = ({
   );
 };
 
-const CardHeader = ({ children, className = '', ...props }) => (
+const CardHeader = ({ children, className = "", ...props }) => (
   <div className={`mb-4 ${className}`} {...props}>
     {children}
   </div>
 );
 
-const CardTitle = ({ children, className = '', ...props }) => (
-  <h3 className={`text-xl font-semibold text-duo-text-primary ${className}`} {...props}>
+const CardTitle = ({ children, className = "", ...props }) => (
+  <h3
+    className={`text-xl font-semibold text-duo-text-primary ${className}`}
+    {...props}
+  >
     {children}
   </h3>
 );
 
-const CardContent = ({ children, className = '', ...props }) => (
+const CardContent = ({ children, className = "", ...props }) => (
   <div className={className} {...props}>
     {children}
   </div>
 );
 
-const CardFooter = ({ children, className = '', ...props }) => (
+const CardFooter = ({ children, className = "", ...props }) => (
   <div className={`mt-4 ${className}`} {...props}>
     {children}
   </div>

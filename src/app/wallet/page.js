@@ -22,6 +22,7 @@ export default function Wallet() {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => {
     if (!loading && !authenticated) {
@@ -93,7 +94,18 @@ export default function Wallet() {
       // Note: After successful payment, user will be redirected to /payment-status page
     } catch (err) {
       console.error("Payment error:", err);
-      setError(err.message || "Payment failed. Please try again.");
+      const raw = err?.message || "";
+      // Detect Cashfree phone invalid error and show guidance modal
+      if (
+        raw.includes("customer_phone") ||
+        raw.includes("phone") ||
+        raw.includes("customer_details.customer_phone_invalid")
+      ) {
+        setShowProfileModal(true);
+        setError("");
+      } else {
+        setError(err.message || "Payment failed. Please try again.");
+      }
     } finally {
       setPaymentLoading(false);
     }
@@ -120,12 +132,12 @@ export default function Wallet() {
         showBack={true}
         onBack={() => router.push("/dashboard")}
       >
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="max-w-2xl mx-auto space-y-6 px-2 sm:px-0">
           {/* Current Balance */}
           <Card className="bg-duo-bg-purple">
             <div className="text-center">
               <h2 className="text-lg font-medium text-duo-text-primary mb-2">
-                My DuoBalance
+                Duo Balance
               </h2>
               <div className="flex items-center justify-center space-x-2">
                 <span className="text-3xl">₹</span>
@@ -142,7 +154,7 @@ export default function Wallet() {
           {/* Add Coins Form */}
           <Card>
             <Card.Header>
-              <Card.Title>Add Coins to Wallet</Card.Title>
+              <Card.Title>Add Coins to Duo Balance</Card.Title>
             </Card.Header>
             <Card.Content>
               <div className="space-y-6">
@@ -306,7 +318,7 @@ export default function Wallet() {
                 >
                   {paymentLoading
                     ? "Processing Payment..."
-                    : `Add ₹${amount || "0"} to Wallet`}
+                    : `Add ₹${amount || "0"} to Duo Balance`}
                 </Button>
               </div>
             </Card.Content>
@@ -345,6 +357,62 @@ export default function Wallet() {
             </Card.Content>
           </Card>
         </div>
+        {/* Modal prompting profile completion in app for invalid phone */}
+        {showProfileModal && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30 p-4">
+            <div className="bg-white rounded-xl w-full max-w-md shadow-2xl p-5 sm:p-6">
+              <div className="text-center">
+                <div className="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg
+                    className="w-7 h-7 text-yellow-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01M12 5a7 7 0 100 14 7 7 0 000-14z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                  Complete Account Setup
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Please login on the DuoCortex mobile app and complete your
+                  profile (add a valid phone number). Then come back to add
+                  coins.
+                </p>
+              </div>
+              <div className="mt-4 grid sm:grid-cols-2 gap-3">
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.duocortex"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg border-2 border-duo-primary text-duo-primary hover:bg-duo-primary hover:text-white transition-colors"
+                >
+                  Get Android App
+                </a>
+                <a
+                  href="https://apps.apple.com/in/app/duocortex/id6749133589"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  Get iOS App
+                </a>
+              </div>
+              <button
+                onClick={() => setShowProfileModal(false)}
+                className="mt-3 w-full bg-duo-primary text-white py-2 rounded-lg hover:bg-duo-primary/90"
+              >
+                Okay
+              </button>
+            </div>
+          </div>
+        )}
       </Layout>
     </Suspense>
   );

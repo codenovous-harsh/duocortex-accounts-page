@@ -24,14 +24,14 @@ function LoginComponent() {
 
   useEffect(() => {
     // Handle URL error parameters from NextAuth
-    const errorParam = searchParams.get('error');
-    const messageParam = searchParams.get('message');
-    
-    if (errorParam === 'AccessDenied' || errorParam === 'AuthError') {
+    const errorParam = searchParams.get("error");
+    const messageParam = searchParams.get("message");
+
+    if (errorParam === "AccessDenied" || errorParam === "AuthError") {
       if (messageParam) {
         setError(decodeURIComponent(messageParam));
       } else {
-        setError('Authentication failed. Please try again.');
+        setError("Authentication failed. Please try again.");
       }
       // Clean up the URL without reloading the page
       const cleanUrl = window.location.pathname;
@@ -43,30 +43,36 @@ function LoginComponent() {
       if (processedSession.current === sessionId) {
         return;
       }
-      
-      if ((session.provider === "apple" || session.provider === "google") && session.backendToken) {
+
+      if (
+        (session.provider === "apple" || session.provider === "google") &&
+        session.backendToken
+      ) {
         processedSession.current = sessionId;
         setIsProcessingAuth(true);
-        
-        localStorage.setItem('accessToken', session.backendToken);
+
+        localStorage.setItem("accessToken", session.backendToken);
         if (session.backendUser) {
-          localStorage.setItem('userInfo', JSON.stringify(session.backendUser));
+          localStorage.setItem("userInfo", JSON.stringify(session.backendUser));
         }
-        
+
         // Set a flag to prevent redirect conflicts and clear NextAuth session
-        sessionStorage.setItem('processingAuth', 'true');
+        sessionStorage.setItem("processingAuth", "true");
         signOut({ redirect: false }).then(() => {
-          window.dispatchEvent(new CustomEvent('authChange'));
-          sessionStorage.removeItem('processingAuth');
-          router.push('/dashboard');
+          window.dispatchEvent(new CustomEvent("authChange"));
+          sessionStorage.removeItem("processingAuth");
+          router.push("/dashboard");
         });
-      } else if (session.provider !== "apple" && session.provider !== "google") {
+      } else if (
+        session.provider !== "apple" &&
+        session.provider !== "google"
+      ) {
         router.push("/dashboard");
       }
     } else if (status === "unauthenticated" && !isProcessingAuth) {
-      const storedToken = localStorage.getItem('accessToken');
-      if (storedToken && window.location.pathname === '/login') {
-        router.push('/dashboard');
+      const storedToken = localStorage.getItem("accessToken");
+      if (storedToken && window.location.pathname === "/login") {
+        router.push("/dashboard");
       }
     }
   }, [status, session, router, searchParams, isProcessingAuth]);
@@ -82,30 +88,39 @@ function LoginComponent() {
     setError("");
 
     try {
-      const device_id = `web-client-${Date.now()}-${Math.random().toString(36).substring(2)}`;
-      
-      const response = await axios.post(`${ENV_CONFIG.BACKEND_URL}/auth/login`, {
-        email,
-        password,
-        device_id
-      }, {
-        timeout: 30000,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      const device_id = `web-client-${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(2)}`;
+
+      const response = await axios.post(
+        `${ENV_CONFIG.BACKEND_URL}/auth/login`,
+        {
+          email,
+          password,
+          device_id,
+        },
+        {
+          timeout: 30000,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       if (response.data && response.data.token) {
-        localStorage.setItem('accessToken', response.data.token);
+        localStorage.setItem("accessToken", response.data.token);
         if (response.data.user) {
-          localStorage.setItem('userInfo', JSON.stringify(response.data.user));
+          localStorage.setItem("userInfo", JSON.stringify(response.data.user));
         }
-        
-        window.dispatchEvent(new CustomEvent('authChange'));
+
+        window.dispatchEvent(new CustomEvent("authChange"));
         router.push("/dashboard");
       } else {
         setError("Invalid email or password");
       }
     } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message || "An error occurred during login";
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "An error occurred during login";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -149,7 +164,7 @@ function LoginComponent() {
   }
 
   return (
-    <div className="flex justify-center items-center px-4 py-12 min-h-screen bg-white sm:px-6 lg:px-8">
+    <div className="flex justify-center items-center px-4 sm:px-6 lg:px-8 py-10 sm:py-12 min-h-screen bg-white">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <h2 className="mb-2 text-3xl font-semibold text-gray-900">
@@ -158,7 +173,7 @@ function LoginComponent() {
           <p className="text-xl text-gray-600">We&apos;re glad to see you</p>
         </div>
 
-        <Card className="p-6">
+        <Card className="p-6" padding="large">
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               type="email"
@@ -193,7 +208,6 @@ function LoginComponent() {
               </button>
             </div>
 
-
             {error && (
               <div className="text-sm text-center text-red-600">{error}</div>
             )}
@@ -207,6 +221,14 @@ function LoginComponent() {
               {isLoading ? <LoadingSpinner size="small" /> : "Login"}
             </Button>
           </form>
+
+          {/* Signup hint */}
+          <p className="mt-4 text-center text-sm text-gray-600">
+            New here?{" "}
+            <a href="/signup" className="text-duo-primary hover:underline">
+              Create an account
+            </a>
+          </p>
 
           <div className="mt-6">
             <div className="relative">
@@ -269,7 +291,13 @@ function LoginComponent() {
 
 export default function Login() {
   return (
-    <Suspense fallback={<div className="flex justify-center items-center min-h-screen bg-white"><LoadingSpinner size="large" /></div>}>
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center min-h-screen bg-white">
+          <LoadingSpinner size="large" />
+        </div>
+      }
+    >
       <LoginComponent />
     </Suspense>
   );
