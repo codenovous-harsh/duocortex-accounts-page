@@ -4,7 +4,7 @@ import api, { endpoints } from "./axios";
 const CASHFREE_CONFIG = {
   clientId: process.env.CASHFREE_CLIENT_ID,
   clientSecret: process.env.CASHFREE_CLIENT_SECRET,
-  environment: "SANDBOX", // Change to 'PRODUCTION' for live
+  environment: "PRODUCTION", // Change to 'PRODUCTION' for live
 };
 
 /**
