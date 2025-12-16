@@ -16,6 +16,11 @@ export const endpoints = {
   getOrderStatus: "api/get-order-status",
   // Transaction history
   quizHistory: "quizzes/history",
+  // Event endpoints
+  getEvents: "events",
+  getEventById: (eventId) => `events/${eventId}`,
+  createEventOrder: "create-event-order",
+  verifyEventPayment: "verify-event-payment",
 };
 
 // Create axios instance for API calls
