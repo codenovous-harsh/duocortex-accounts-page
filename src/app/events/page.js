@@ -135,6 +135,26 @@ export default function EventsPage() {
 
                   {/* Event Details */}
                   <div className="space-y-2 mb-4">
+                    {/* Event Date and Time */}
+                    <div className="flex items-center">
+                      <svg
+                        className="w-5 h-5 text-duo-text-secondary mr-2 flex-shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <p className="text-sm text-duo-text-secondary">
+                        {formatDate(event.eventDate)} at {event.eventTime}
+                      </p>
+                    </div>
+
                     <div className="flex items-start">
                       <svg
                         className="w-5 h-5 text-duo-text-secondary mr-2 mt-0.5 flex-shrink-0"

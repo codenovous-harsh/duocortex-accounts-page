@@ -217,6 +217,12 @@ function EventPaymentStatusContent() {
                   </span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-duo-text-secondary">College</span>
+                  <span className="text-duo-text-primary font-medium">
+                    {attendeeDetails.collegeName}
+                  </span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-duo-text-secondary">Registration Date</span>
                   <span className="text-duo-text-primary font-medium">
                     {new Date(attendeeDetails.registeredAt).toLocaleDateString("en-IN", {

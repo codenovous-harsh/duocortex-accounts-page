@@ -25,6 +25,7 @@ export default function EventRegistrationPage() {
     fullName: "",
     email: "",
     phoneNumber: "",
+    collegeName: "",
   });
   const [formErrors, setFormErrors] = useState({});
 
@@ -73,6 +74,10 @@ export default function EventRegistrationPage() {
       errors.phoneNumber = "Invalid phone number (10 digits required)";
     }
 
+    if (!formData.collegeName.trim()) {
+      errors.collegeName = "College name is required";
+    }
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -101,11 +106,13 @@ export default function EventRegistrationPage() {
         customer_name: formData.fullName,
         customer_email: formData.email,
         customer_phone: formData.phoneNumber,
+        college_name: formData.collegeName,
         order_amount: event.price,
       });
 
       if (orderResponse.data.status !== "success") {
-        throw new Error("Failed to create event order");
+        const errorMessage = orderResponse.data.error || "Failed to create event order";
+        throw new Error(errorMessage);
       }
 
       const { payment_session_id, order_id } = orderResponse.data.data;
@@ -133,7 +140,24 @@ export default function EventRegistrationPage() {
       // Note: After successful payment, Cashfree will redirect to /event-payment-status
     } catch (err) {
       console.error("Registration error:", err);
-      setError(err.message || "Registration failed. Please try again.");
+
+      // Extract error message from API response
+      let errorMessage = "Registration failed. Please try again.";
+
+      if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+
+        // Provide user-friendly messages for specific errors
+        if (err.response.data.code === "already_registered") {
+          errorMessage = "You are already registered for this event. Check your email for confirmation details.";
+        } else if (errorMessage.includes("full")) {
+          errorMessage = "Sorry, this event is now full. No more spots available.";
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+
+      setError(errorMessage);
       setPaymentLoading(false);
     }
   };
@@ -233,6 +257,29 @@ export default function EventRegistrationPage() {
 
             {/* Event Details Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {/* Event Date and Time */}
+              <div className="flex items-start">
+                <svg
+                  className="w-6 h-6 text-duo-primary mr-3 mt-1 flex-shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <div>
+                  <p className="text-sm text-duo-text-secondary font-medium">Date & Time</p>
+                  <p className="text-duo-text-primary">
+                    {formatDate(event.eventDate)} at {event.eventTime}
+                  </p>
+                </div>
+              </div>
+
               <div className="flex items-start">
                 <svg
                   className="w-6 h-6 text-duo-primary mr-3 mt-1 flex-shrink-0"
@@ -363,6 +410,18 @@ export default function EventRegistrationPage() {
                   onChange={handleInputChange}
                   placeholder="Enter your 10-digit phone number"
                   error={formErrors.phoneNumber}
+                  required
+                />
+
+                {/* College Name */}
+                <Input
+                  label="College Name"
+                  name="collegeName"
+                  type="text"
+                  value={formData.collegeName}
+                  onChange={handleInputChange}
+                  placeholder="Enter your college name"
+                  error={formErrors.collegeName}
                   required
                 />
 
