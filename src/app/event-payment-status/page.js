@@ -19,7 +19,7 @@ function EventPaymentStatusContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [eventDetails, setEventDetails] = useState(null);
-  const [attendeeDetails, setAttendeeDetails] = useState(null);
+  const [registrationDetails, setRegistrationDetails] = useState(null);
 
   // Verify payment on mount
   useEffect(() => {
@@ -46,7 +46,7 @@ function EventPaymentStatusContent() {
       if (response.data.status === "success") {
         setPaymentStatus("success");
         setEventDetails(response.data.data.eventDetails);
-        setAttendeeDetails(response.data.data.attendeeDetails);
+        setRegistrationDetails(response.data.data.registrationDetails);
       } else {
         setPaymentStatus("failed");
         setError(response.data.message || "Payment verification failed");
@@ -75,7 +75,7 @@ function EventPaymentStatusContent() {
   }
 
   // Success State
-  if (paymentStatus === "success" && eventDetails && attendeeDetails) {
+  if (paymentStatus === "success" && eventDetails && registrationDetails) {
     return (
       <Layout title="Registration Successful">
         <div className="max-w-2xl mx-auto space-y-6">
@@ -129,7 +129,7 @@ function EventPaymentStatusContent() {
                     </p>
                     <p className="text-xs text-blue-700 mt-1">
                       We've sent a confirmation email to{" "}
-                      <span className="font-medium">{attendeeDetails.email}</span> with
+                      <span className="font-medium">{registrationDetails.registrantEmail}</span> with
                       your event details and registration information.
                     </p>
                   </div>
@@ -183,7 +183,14 @@ function EventPaymentStatusContent() {
                   <div>
                     <p className="text-sm text-duo-text-secondary">Amount Paid</p>
                     <p className="text-2xl font-bold text-duo-primary">
-                      ₹{attendeeDetails.amountPaid}
+                      ₹{registrationDetails.amountPaid}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-duo-text-secondary">Total Attendees</p>
+                    <p className="text-lg font-semibold text-duo-text-primary">
+                      {registrationDetails.totalAttendees} {registrationDetails.totalAttendees === 1 ? 'Person' : 'People'}
                     </p>
                   </div>
                 </div>
@@ -191,41 +198,29 @@ function EventPaymentStatusContent() {
             </Card.Content>
           </Card>
 
-          {/* Registration Details Card */}
+          {/* Registration Summary Card */}
           <Card>
             <Card.Header>
-              <Card.Title>Your Registration Details</Card.Title>
+              <Card.Title>Registration Summary</Card.Title>
             </Card.Header>
             <Card.Content>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-duo-text-secondary">Full Name</span>
+                  <span className="text-duo-text-secondary">Registrant Email</span>
                   <span className="text-duo-text-primary font-medium">
-                    {attendeeDetails.fullName}
+                    {registrationDetails.registrantEmail}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-duo-text-secondary">Email</span>
+                  <span className="text-duo-text-secondary">Total Attendees</span>
                   <span className="text-duo-text-primary font-medium">
-                    {attendeeDetails.email}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-duo-text-secondary">Phone</span>
-                  <span className="text-duo-text-primary font-medium">
-                    {attendeeDetails.phoneNumber}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-duo-text-secondary">College</span>
-                  <span className="text-duo-text-primary font-medium">
-                    {attendeeDetails.collegeName}
+                    {registrationDetails.totalAttendees}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-duo-text-secondary">Registration Date</span>
                   <span className="text-duo-text-primary font-medium">
-                    {new Date(attendeeDetails.registeredAt).toLocaleDateString("en-IN", {
+                    {new Date(registrationDetails.registeredAt).toLocaleDateString("en-IN", {
                       day: "numeric",
                       month: "short",
                       year: "numeric",
@@ -237,9 +232,56 @@ function EventPaymentStatusContent() {
                 <div className="flex justify-between">
                   <span className="text-duo-text-secondary">Order ID</span>
                   <span className="text-duo-text-primary font-mono text-sm">
-                    {attendeeDetails.orderId}
+                    {registrationDetails.orderId}
                   </span>
                 </div>
+              </div>
+            </Card.Content>
+          </Card>
+
+          {/* Attendees Details Card */}
+          <Card>
+            <Card.Header>
+              <Card.Title>Attendee Details</Card.Title>
+            </Card.Header>
+            <Card.Content>
+              <div className="space-y-4">
+                {registrationDetails.attendees.map((attendee, index) => (
+                  <div
+                    key={index}
+                    className="border border-gray-200 rounded-lg p-4 space-y-2"
+                  >
+                    <h4 className="font-semibold text-duo-text-primary mb-2">
+                      Attendee {index + 1}
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <span className="text-duo-text-secondary">Name:</span>
+                        <p className="text-duo-text-primary font-medium">
+                          {attendee.fullName}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-duo-text-secondary">Phone:</span>
+                        <p className="text-duo-text-primary font-medium">
+                          {attendee.phoneNumber}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-duo-text-secondary">College:</span>
+                        <p className="text-duo-text-primary font-medium">
+                          {attendee.collegeName}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-duo-text-secondary">Gender:</span>
+                        <p className="text-duo-text-primary font-medium capitalize">
+                          {attendee.gender}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </Card.Content>
           </Card>
