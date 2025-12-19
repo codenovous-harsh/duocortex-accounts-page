@@ -113,16 +113,51 @@ export default function EventsPage() {
                       className="w-full h-full object-cover"
                     />
                     {/* Spots Badge */}
-                    <div className="absolute top-3 right-3 bg-white rounded-full px-3 py-1 shadow-md">
-                      <p className="text-xs font-semibold text-duo-text-primary">
-                        {event.spotsLeft > 0 ? (
-                          <span className="text-green-600">
-                            {event.spotsLeft} spots left
-                          </span>
-                        ) : (
-                          <span className="text-red-600">Sold Out</span>
-                        )}
-                      </p>
+                    <div className="absolute top-3 right-3 bg-white rounded-lg px-3 py-2 shadow-md max-w-[150px]">
+                      {event.spotsLeft > 0 ? (
+                        <div className="space-y-1">
+                          {/* Check if it's a gender-specific event */}
+                          {event.maxMaleAttendees !== null && event.maxFemaleAttendees === null ? (
+                            // Male Only Event
+                            <div>
+                              <p className="text-xs font-bold text-blue-600">♂ Male Only</p>
+                              <p className="text-xs text-green-600 font-semibold">
+                                {event.maleSpotsLeft} spots left
+                              </p>
+                            </div>
+                          ) : event.maxFemaleAttendees !== null && event.maxMaleAttendees === null ? (
+                            // Female Only Event
+                            <div>
+                              <p className="text-xs font-bold text-pink-600">♀ Female Only</p>
+                              <p className="text-xs text-green-600 font-semibold">
+                                {event.femaleSpotsLeft} spots left
+                              </p>
+                            </div>
+                          ) : event.maxMaleAttendees !== null && event.maxFemaleAttendees !== null ? (
+                            // Both genders with limits
+                            <div>
+                              <p className="text-xs font-bold text-green-600">
+                                {event.spotsLeft} total left
+                              </p>
+                              <div className="flex gap-2 text-xs mt-1">
+                                <span className="text-blue-600 font-semibold">
+                                  ♂ {event.maleSpotsLeft}
+                                </span>
+                                <span className="text-pink-600 font-semibold">
+                                  ♀ {event.femaleSpotsLeft}
+                                </span>
+                              </div>
+                            </div>
+                          ) : (
+                            // No gender limits
+                            <p className="text-xs font-bold text-green-600">
+                              {event.spotsLeft} spots left
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-xs font-semibold text-red-600">Sold Out</p>
+                      )}
                     </div>
                   </div>
                 )}
@@ -217,6 +252,89 @@ export default function EventsPage() {
                         {event.attendeeCount} / {event.maxAttendees} registered
                       </p>
                     </div>
+
+                    {/* Gender Capacity Display - Only show if BOTH limits are set */}
+                    {event.maxMaleAttendees !== null && event.maxFemaleAttendees !== null && (
+                      <div className="bg-gradient-to-r from-blue-50 to-pink-50 border border-gray-200 rounded-lg p-3 mt-2">
+                        <p className="text-xs font-semibold text-gray-700 mb-2">
+                          Available spots by gender:
+                        </p>
+                        <div className="flex gap-3">
+                          <div className="flex items-center gap-1.5 flex-1">
+                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                              <span className="text-blue-600 font-bold text-sm">♂</span>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600">Male</p>
+                              <p className={`text-sm font-bold ${
+                                event.maleSpotsLeft > 0 ? 'text-blue-600' : 'text-red-600'
+                              }`}>
+                                {event.maleSpotsLeft > 0
+                                  ? `${event.maleSpotsLeft} left`
+                                  : 'Full'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5 flex-1">
+                            <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
+                              <span className="text-pink-600 font-bold text-sm">♀</span>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-600">Female</p>
+                              <p className={`text-sm font-bold ${
+                                event.femaleSpotsLeft > 0 ? 'text-pink-600' : 'text-red-600'
+                              }`}>
+                                {event.femaleSpotsLeft > 0
+                                  ? `${event.femaleSpotsLeft} left`
+                                  : 'Full'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Male Only Event Banner */}
+                    {event.maxMaleAttendees !== null && event.maxFemaleAttendees === null && (
+                      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-3 mt-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                            <span className="text-white font-bold text-lg">♂</span>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-bold text-blue-800">Male Only Event</p>
+                            <p className={`text-xs font-semibold ${
+                              event.maleSpotsLeft > 0 ? 'text-blue-600' : 'text-red-600'
+                            }`}>
+                              {event.maleSpotsLeft > 0
+                                ? `${event.maleSpotsLeft} spots available`
+                                : 'Fully booked'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Female Only Event Banner */}
+                    {event.maxFemaleAttendees !== null && event.maxMaleAttendees === null && (
+                      <div className="bg-pink-50 border-2 border-pink-200 rounded-lg p-3 mt-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center">
+                            <span className="text-white font-bold text-lg">♀</span>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-bold text-pink-800">Female Only Event</p>
+                            <p className={`text-xs font-semibold ${
+                              event.femaleSpotsLeft > 0 ? 'text-pink-600' : 'text-red-600'
+                            }`}>
+                              {event.femaleSpotsLeft > 0
+                                ? `${event.femaleSpotsLeft} spots available`
+                                : 'Fully booked'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Register Button */}

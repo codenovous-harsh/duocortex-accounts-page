@@ -414,6 +414,89 @@ export default function EventRegistrationPage() {
                 </div>
               </div>
             </div>
+
+            {/* Gender Capacity Information */}
+            {event.maxMaleAttendees !== null && event.maxFemaleAttendees !== null && (
+              <div className="mt-4 bg-gradient-to-r from-blue-50 to-pink-50 border-2 border-gray-200 rounded-lg p-4">
+                <p className="text-sm font-bold text-gray-700 mb-3">
+                  Available Spots by Gender:
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white rounded-lg p-3 border-2 border-blue-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-lg">♂</span>
+                      </div>
+                      <p className="text-sm font-bold text-blue-800">Male</p>
+                    </div>
+                    <p className={`text-lg font-bold ${
+                      event.maleSpotsLeft > 0 ? 'text-blue-600' : 'text-red-600'
+                    }`}>
+                      {event.maleSpotsLeft > 0
+                        ? `${event.maleSpotsLeft} spots left`
+                        : 'Fully booked'}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 border-2 border-pink-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-lg">♀</span>
+                      </div>
+                      <p className="text-sm font-bold text-pink-800">Female</p>
+                    </div>
+                    <p className={`text-lg font-bold ${
+                      event.femaleSpotsLeft > 0 ? 'text-pink-600' : 'text-red-600'
+                    }`}>
+                      {event.femaleSpotsLeft > 0
+                        ? `${event.femaleSpotsLeft} spots left`
+                        : 'Fully booked'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Male Only Event Banner */}
+            {event.maxMaleAttendees !== null && event.maxFemaleAttendees === null && (
+              <div className="mt-4 bg-blue-50 border-2 border-blue-300 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-2xl">♂</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-lg font-bold text-blue-900">Male Only Event</p>
+                    <p className={`text-sm font-semibold ${
+                      event.maleSpotsLeft > 0 ? 'text-blue-600' : 'text-red-600'
+                    }`}>
+                      {event.maleSpotsLeft > 0
+                        ? `${event.maleSpotsLeft} spots available for registration`
+                        : 'Event is fully booked'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Female Only Event Banner */}
+            {event.maxFemaleAttendees !== null && event.maxMaleAttendees === null && (
+              <div className="mt-4 bg-pink-50 border-2 border-pink-300 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-2xl">♀</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-lg font-bold text-pink-900">Female Only Event</p>
+                    <p className={`text-sm font-semibold ${
+                      event.femaleSpotsLeft > 0 ? 'text-pink-600' : 'text-red-600'
+                    }`}>
+                      {event.femaleSpotsLeft > 0
+                        ? `${event.femaleSpotsLeft} spots available for registration`
+                        : 'Event is fully booked'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </Card>
 
