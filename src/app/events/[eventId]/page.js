@@ -24,8 +24,9 @@ export default function EventRegistrationPage() {
   const [email, setEmail] = useState("");
   const [attendeeCount, setAttendeeCount] = useState(1);
   const [attendees, setAttendees] = useState([
-    { fullName: "", phoneNumber: "", collegeName: "", gender: "male" }
+    { fullName: "", phoneNumber: "", collegeName: "", gender: "male", profession: "" }
   ]);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
   // Fetch event details on mount
@@ -63,7 +64,7 @@ export default function EventRegistrationPage() {
     if (newCount > attendees.length) {
       // Add more attendee slots
       for (let i = attendees.length; i < newCount; i++) {
-        newAttendees.push({ fullName: "", phoneNumber: "", collegeName: "", gender: "male" });
+        newAttendees.push({ fullName: "", phoneNumber: "", collegeName: "", gender: "male", profession: "" });
       }
     } else if (newCount < attendees.length) {
       // Remove extra attendee slots
@@ -114,7 +115,16 @@ export default function EventRegistrationPage() {
       if (!attendee.gender || !["male", "female"].includes(attendee.gender)) {
         errors[`attendee${index}_gender`] = `Attendee ${index + 1}: Gender is required`;
       }
+
+      if (!attendee.profession || !attendee.profession.trim()) {
+        errors[`attendee${index}_profession`] = `Attendee ${index + 1}: Profession is required`;
+      }
     });
+
+    // Validate terms acceptance
+    if (!termsAccepted) {
+      errors.terms = "You must accept the terms and conditions to register";
+    }
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -163,6 +173,7 @@ export default function EventRegistrationPage() {
           phoneNumber: a.phoneNumber.trim(),
           collegeName: a.collegeName.trim(),
           gender: a.gender,
+          profession: a.profession.trim(),
         })),
       });
 
@@ -415,6 +426,41 @@ export default function EventRegistrationPage() {
               </div>
             </div>
 
+            {/* Event Description */}
+            {event.eventDescription && (
+              <div className="mt-6 p-4 bg-duo-bg-gray rounded-lg">
+                <h3 className="text-lg font-semibold text-duo-text-primary mb-2">About This Event</h3>
+                <p className="text-duo-text-secondary whitespace-pre-wrap">{event.eventDescription}</p>
+              </div>
+            )}
+
+            {/* Event Attachment */}
+            {event.eventAttachment?.url && (
+              <div className="mt-4">
+                <a
+                  href={event.eventAttachment.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-3 bg-duo-primary text-white rounded-lg hover:bg-opacity-90 transition"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  <span>Download Event Details (PDF)</span>
+                </a>
+              </div>
+            )}
+
             {/* Gender Capacity Information */}
             {event.maxMaleAttendees !== null && event.maxFemaleAttendees !== null && (
               <div className="mt-4 bg-gradient-to-r from-blue-50 to-pink-50 border-2 border-gray-200 rounded-lg p-4">
@@ -631,6 +677,27 @@ export default function EventRegistrationPage() {
                         <p className="text-sm text-red-600 mt-1">{formErrors[`attendee${index}_gender`]}</p>
                       )}
                     </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-duo-text-primary mb-2">
+                        Who are you? <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={attendee.profession}
+                        onChange={(e) => handleAttendeeChange(index, 'profession', e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-duo-primary"
+                      >
+                        <option value="">Select your profession</option>
+                        <option value="MBBS Students">MBBS Students</option>
+                        <option value="Nursing Students">Nursing Students</option>
+                        <option value="Doctors">Doctors</option>
+                        <option value="Nurse">Nurse</option>
+                        <option value="Allied health services">Allied health services</option>
+                      </select>
+                      {formErrors[`attendee${index}_profession`] && (
+                        <p className="text-sm text-red-600 mt-1">{formErrors[`attendee${index}_profession`]}</p>
+                      )}
+                    </div>
                   </div>
                 ))}
 
@@ -649,6 +716,40 @@ export default function EventRegistrationPage() {
                     <span className="text-duo-text-primary font-bold">Total Amount</span>
                     <span className="text-2xl font-bold text-duo-primary">₹{event.price * attendeeCount}</span>
                   </div>
+                </div>
+
+                {/* Terms and Conditions */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <label className="flex items-start cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={termsAccepted}
+                      onChange={(e) => {
+                        setTermsAccepted(e.target.checked);
+                        if (e.target.checked && formErrors.terms) {
+                          const newErrors = { ...formErrors };
+                          delete newErrors.terms;
+                          setFormErrors(newErrors);
+                        }
+                      }}
+                      className="mt-1 mr-3"
+                    />
+                    <span className="text-sm text-duo-text-primary">
+                      I agree to the{" "}
+                      <a
+                        href="/terms-and-conditions.pdf"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-duo-primary hover:underline font-medium"
+                      >
+                        Terms and Conditions
+                      </a>
+                      {" "}<span className="text-red-500">*</span>
+                    </span>
+                  </label>
+                  {formErrors.terms && (
+                    <p className="text-sm text-red-600 mt-2">{formErrors.terms}</p>
+                  )}
                 </div>
 
                 {/* Register Button */}
