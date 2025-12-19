@@ -21,12 +21,11 @@ export default function EventRegistrationPage() {
   const [paymentLoading, setPaymentLoading] = useState(false);
 
   // Form state
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phoneNumber: "",
-    collegeName: "",
-  });
+  const [email, setEmail] = useState("");
+  const [attendeeCount, setAttendeeCount] = useState(1);
+  const [attendees, setAttendees] = useState([
+    { fullName: "", phoneNumber: "", collegeName: "", gender: "male" }
+  ]);
   const [formErrors, setFormErrors] = useState({});
 
   // Fetch event details on mount
@@ -55,39 +54,78 @@ export default function EventRegistrationPage() {
     }
   };
 
+  // Update attendee count and adjust attendees array
+  const handleAttendeeCountChange = (count) => {
+    const newCount = parseInt(count);
+    setAttendeeCount(newCount);
+
+    const newAttendees = [...attendees];
+    if (newCount > attendees.length) {
+      // Add more attendee slots
+      for (let i = attendees.length; i < newCount; i++) {
+        newAttendees.push({ fullName: "", phoneNumber: "", collegeName: "", gender: "male" });
+      }
+    } else if (newCount < attendees.length) {
+      // Remove extra attendee slots
+      newAttendees.splice(newCount);
+    }
+    setAttendees(newAttendees);
+  };
+
+  const handleAttendeeChange = (index, field, value) => {
+    const newAttendees = [...attendees];
+    newAttendees[index][field] = value;
+    setAttendees(newAttendees);
+
+    // Clear error for this field
+    if (formErrors[`attendee${index}_${field}`]) {
+      const newErrors = { ...formErrors };
+      delete newErrors[`attendee${index}_${field}`];
+      setFormErrors(newErrors);
+    }
+  };
+
   const validateForm = () => {
     const errors = {};
 
-    if (!formData.fullName.trim()) {
-      errors.fullName = "Full name is required";
-    }
-
-    if (!formData.email.trim()) {
+    // Validate email
+    if (!email.trim()) {
       errors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
       errors.email = "Invalid email format";
     }
 
-    if (!formData.phoneNumber.trim()) {
-      errors.phoneNumber = "Phone number is required";
-    } else if (!/^\d{10}$/.test(formData.phoneNumber.replace(/\D/g, ""))) {
-      errors.phoneNumber = "Invalid phone number (10 digits required)";
-    }
+    // Validate each attendee
+    attendees.forEach((attendee, index) => {
+      if (!attendee.fullName.trim()) {
+        errors[`attendee${index}_fullName`] = `Attendee ${index + 1}: Full name is required`;
+      }
 
-    if (!formData.collegeName.trim()) {
-      errors.collegeName = "College name is required";
-    }
+      if (!attendee.phoneNumber.trim()) {
+        errors[`attendee${index}_phoneNumber`] = `Attendee ${index + 1}: Phone number is required`;
+      } else if (!/^\d{10}$/.test(attendee.phoneNumber.replace(/\D/g, ""))) {
+        errors[`attendee${index}_phoneNumber`] = `Attendee ${index + 1}: Invalid phone number (10 digits required)`;
+      }
+
+      if (!attendee.collegeName.trim()) {
+        errors[`attendee${index}_collegeName`] = `Attendee ${index + 1}: College name is required`;
+      }
+
+      if (!attendee.gender || !["male", "female"].includes(attendee.gender)) {
+        errors[`attendee${index}_gender`] = `Attendee ${index + 1}: Gender is required`;
+      }
+    });
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error for this field
-    if (formErrors[name]) {
-      setFormErrors((prev) => ({ ...prev, [name]: "" }));
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+    if (formErrors.email) {
+      const newErrors = { ...formErrors };
+      delete newErrors.email;
+      setFormErrors(newErrors);
     }
   };
 
@@ -100,14 +138,32 @@ export default function EventRegistrationPage() {
       setPaymentLoading(true);
       setError(null);
 
+      // Check gender capacity if limits are set
+      const maleCount = attendees.filter(a => a.gender === "male").length;
+      const femaleCount = attendees.filter(a => a.gender === "female").length;
+
+      if (event.maleSpotsLeft !== null && maleCount > event.maleSpotsLeft) {
+        setError(`Not enough male spots available. Only ${event.maleSpotsLeft} male spot(s) remaining.`);
+        setPaymentLoading(false);
+        return;
+      }
+
+      if (event.femaleSpotsLeft !== null && femaleCount > event.femaleSpotsLeft) {
+        setError(`Not enough female spots available. Only ${event.femaleSpotsLeft} female spot(s) remaining.`);
+        setPaymentLoading(false);
+        return;
+      }
+
       // Create event order
       const orderResponse = await api.post(endpoints.createEventOrder, {
         eventId: eventId,
-        customer_name: formData.fullName,
-        customer_email: formData.email,
-        customer_phone: formData.phoneNumber,
-        college_name: formData.collegeName,
-        order_amount: event.price,
+        customer_email: email,
+        attendees: attendees.map(a => ({
+          fullName: a.fullName.trim(),
+          phoneNumber: a.phoneNumber.trim(),
+          collegeName: a.collegeName.trim(),
+          gender: a.gender,
+        })),
       });
 
       if (orderResponse.data.status !== "success") {
@@ -376,60 +432,139 @@ export default function EventRegistrationPage() {
                   </div>
                 )}
 
-                {/* Full Name */}
-                <Input
-                  label="Full Name"
-                  name="fullName"
-                  type="text"
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                  placeholder="Enter your full name"
-                  error={formErrors.fullName}
-                  required
-                />
-
                 {/* Email */}
                 <Input
                   label="Email Address"
                   name="email"
                   type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
+                  value={email}
+                  onChange={handleEmailChange}
                   placeholder="your.email@example.com"
                   error={formErrors.email}
                   helper="We'll send the confirmation to this email"
                   required
                 />
 
-                {/* Phone Number */}
-                <Input
-                  label="Phone Number"
-                  name="phoneNumber"
-                  type="tel"
-                  value={formData.phoneNumber}
-                  onChange={handleInputChange}
-                  placeholder="Enter your 10-digit phone number"
-                  error={formErrors.phoneNumber}
-                  required
-                />
+                {/* Number of Attendees */}
+                <div>
+                  <label className="block text-sm font-medium text-duo-text-primary mb-2">
+                    Number of Attendees <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={attendeeCount}
+                    onChange={(e) => handleAttendeeCountChange(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-duo-primary"
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                      <option key={num} value={num}>{num} {num === 1 ? 'Person' : 'People'}</option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-duo-text-secondary mt-1">
+                    Select how many people you want to register (including yourself)
+                  </p>
+                </div>
 
-                {/* College Name */}
-                <Input
-                  label="College Name"
-                  name="collegeName"
-                  type="text"
-                  value={formData.collegeName}
-                  onChange={handleInputChange}
-                  placeholder="Enter your college name"
-                  error={formErrors.collegeName}
-                  required
-                />
+                {/* Gender Capacity Info */}
+                {(event.maleSpotsLeft !== null || event.femaleSpotsLeft !== null) && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p className="text-sm text-blue-800 font-medium mb-1">Gender-specific capacity:</p>
+                    <div className="flex gap-4 text-xs text-blue-700">
+                      {event.maleSpotsLeft !== null && (
+                        <span>Male: {event.maleSpotsLeft} spots left</span>
+                      )}
+                      {event.femaleSpotsLeft !== null && (
+                        <span>Female: {event.femaleSpotsLeft} spots left</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Attendee Details */}
+                {attendees.map((attendee, index) => (
+                  <div key={index} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                    <h3 className="text-lg font-semibold text-duo-text-primary mb-3">
+                      Attendee {index + 1}
+                    </h3>
+
+                    <Input
+                      label="Full Name"
+                      type="text"
+                      value={attendee.fullName}
+                      onChange={(e) => handleAttendeeChange(index, 'fullName', e.target.value)}
+                      placeholder="Enter full name"
+                      error={formErrors[`attendee${index}_fullName`]}
+                      required
+                    />
+
+                    <Input
+                      label="Phone Number"
+                      type="tel"
+                      value={attendee.phoneNumber}
+                      onChange={(e) => handleAttendeeChange(index, 'phoneNumber', e.target.value)}
+                      placeholder="Enter 10-digit phone number"
+                      error={formErrors[`attendee${index}_phoneNumber`]}
+                      required
+                    />
+
+                    <Input
+                      label="College Name"
+                      type="text"
+                      value={attendee.collegeName}
+                      onChange={(e) => handleAttendeeChange(index, 'collegeName', e.target.value)}
+                      placeholder="Enter college name"
+                      error={formErrors[`attendee${index}_collegeName`]}
+                      required
+                    />
+
+                    <div>
+                      <label className="block text-sm font-medium text-duo-text-primary mb-2">
+                        Gender <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex gap-4">
+                        <label className="flex items-center cursor-pointer">
+                          <input
+                            type="radio"
+                            name={`gender${index}`}
+                            value="male"
+                            checked={attendee.gender === "male"}
+                            onChange={(e) => handleAttendeeChange(index, 'gender', e.target.value)}
+                            className="mr-2"
+                          />
+                          <span className="text-duo-text-primary">Male</span>
+                        </label>
+                        <label className="flex items-center cursor-pointer">
+                          <input
+                            type="radio"
+                            name={`gender${index}`}
+                            value="female"
+                            checked={attendee.gender === "female"}
+                            onChange={(e) => handleAttendeeChange(index, 'gender', e.target.value)}
+                            className="mr-2"
+                          />
+                          <span className="text-duo-text-primary">Female</span>
+                        </label>
+                      </div>
+                      {formErrors[`attendee${index}_gender`] && (
+                        <p className="text-sm text-red-600 mt-1">{formErrors[`attendee${index}_gender`]}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
 
                 {/* Payment Summary */}
                 <div className="bg-duo-bg-gray p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-duo-text-primary font-medium">Price per person</span>
+                    <span className="text-duo-text-primary">₹{event.price}</span>
+                  </div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-duo-text-primary font-medium">Number of attendees</span>
+                    <span className="text-duo-text-primary">× {attendeeCount}</span>
+                  </div>
+                  <div className="border-t border-gray-300 my-2"></div>
                   <div className="flex justify-between items-center">
-                    <span className="text-duo-text-primary font-medium">Total Amount</span>
-                    <span className="text-2xl font-bold text-duo-primary">₹{event.price}</span>
+                    <span className="text-duo-text-primary font-bold">Total Amount</span>
+                    <span className="text-2xl font-bold text-duo-primary">₹{event.price * attendeeCount}</span>
                   </div>
                 </div>
 
@@ -442,7 +577,7 @@ export default function EventRegistrationPage() {
                   size="large"
                   className="w-full"
                 >
-                  {paymentLoading ? "Processing..." : `Pay ₹${event.price} & Register`}
+                  {paymentLoading ? "Processing..." : `Pay ₹${event.price * attendeeCount} & Register`}
                 </Button>
 
                 {/* Security Notice */}
