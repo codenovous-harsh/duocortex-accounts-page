@@ -17,7 +17,7 @@ export const metadata = {
   title: "DuoCortex Accounts - Duo Balance Management Portal",
   description: "Secure duo balance management portal for DuoCortex users",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/duocortex-logo.png",
   },
 };
 
